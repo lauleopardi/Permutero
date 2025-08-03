@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permutero Derecho UNLP - Intercambiá tus comisiones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --azul-unlp: #003366;
+            --azul-claro: #1a5490;
+            --dorado: #FFD700;
+            --dorado-claro: #FFF8DC;
+            --gris-claro: #f5f5f5;
+            --texto: #333;
+            --sombra: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--gris-claro);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--azul-unlp) 0%, var(--azul-claro) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px var(--sombra);
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .disclaimer {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Estadísticas motivacionales */
+        .stats-banner {
+            background: var(--dorado-claro);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 3px solid var(--dorado);
+        }
+
+        .stats-banner p {
+            font-weight: 600;
+            color: var(--azul-unlp);
+            font-size: 0.95rem;
+        }
+
+        /* Navegación por pestañas */
+        .tab-navigation {
+            background: white;
+            box-shadow: 0 2px 10px var(--sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tabs {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--texto);
+            transition: all 0.3s ease;
+            position: relative;
+            white-space: nowrap;
+            min-width: 150px;
+        }
+
+        .tab:hover {
+            background: var(--gris-claro);
+        }
+
+        .tab.active {
+            color: var(--azul-unlp);
+            background: var(--gris-claro);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--azul-unlp);
+        }
+
+        .tab-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Advertencia SIU Guaraní */
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .warning-icon {
+            font-size: 2rem;
+            color: #ff9800;
+        }
+
+        /* Formulario */
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px var(--sombra);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--azul-unlp);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--azul-unlp);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .btn {
+            background: var(--azul-unlp);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: var(--azul-claro);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--sombra);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--azul-unlp);
+            border: 2px solid var(--azul-unlp);
+        }
+
+        .btn-secondary:hover {
+            background: var(--azul-unlp);
+            color: white;
+        }
+
+        /* Tarjetas de ofertas */
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px var(--sombra);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .offer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px var(--sombra);
+            border-color: var(--azul-unlp);
+        }
+
+        .offer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .subject-tag {
+            background: var(--azul-unlp);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .match-indicator {
+            background: #4caf50;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .exchange-info {
+            background: var(--gris-claro);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .exchange-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .contact-btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Sección de éxitos */
+        .success-stories {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .success-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 5px solid #4caf50;
+        }
+
+        .success-date {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Filtros */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px var(--sombra);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Notificación de coincidencias */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .tabs {
+                overflow-x: scroll;
+            }
+
+            .offers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loader::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--azul-unlp);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <h1>⚖️ Permutero Derecho UNLP</h1>
+            <p class="subtitle">Intercambiá tus comisiones de forma fácil y rápida</p>
+            <span class="disclaimer">🔒 Sitio no oficial - Creado por y para estudiantes</span>
+        </div>
+    </header>
+
+    <!-- Banner motivacional -->
+    <div class="stats-banner">
+        <p>🎯 ¡En 2023, el 72% de los usuarios logró cambiar su comisión exitosamente!</p>
+    </div>
+
+    <!-- Navegación por pestañas -->
+    <nav class="tab-navigation">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('busco-cambiar')">
+                <span class="tab-icon">📌</span>Busco cambiar
+            </button>
+            <button class="tab" onclick="switchTab('ofertas')">
+                <span class="tab-icon">🔍</span>Ofertas disponibles
+            </button>
+            <button class="tab" onclick="switchTab('exitos')">
+                <span class="tab-icon">📢</span>Éxitos de permuta
+            </button>
+            <button class="tab" onclick="switchTab('como-funciona')">
+                <span class="tab-icon">❓</span>¿Cómo funciona?
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <!-- Tab: Busco cambiar -->
+        <div id="busco-cambiar" class="tab-content active">
+            <div class="warning-box">
+                <span class="warning-icon">⚠️</span>
+                <div>
+                    <strong>Importante:</strong> SIU Guaraní solo permite permutas si ambas partes coinciden en el trámite simultáneamente. Coordiná bien con tu compañero/a de intercambio.
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h2>Publicá tu solicitud de permuta</h2>
+                <form id="permuteForm">
+                    <div class="form-group">
+                        <label for="materia">Materia *</label>
+                        <select id="materia" required>
+                            <option value="">Seleccioná una materia</option>
+                            <option value="introduccion-derecho">Introducción al Derecho</option>
+                            <option value="derecho-romano">Derecho Romano</option>
+                            <option value="historia-constitucional">Historia Constitucional</option>
+                            <option value="derecho-politico">Derecho Político</option>
+                            <option value="economia-politica">Economía Política</option>
+                            <option value="derecho-privado-i">Derecho Privado I</option>
+                            <option value="derecho-penal-i">Derecho Penal I</option>
+                            <option value="derecho-constitucional">Derecho Constitucional</option>
+                            <option value="derecho-privado-ii">Derecho Privado II</option>
+                            <option value="sociologia-juridica">Sociología Jurídica</option>
+                            <option value="derecho-privado-iii">Derecho Privado III</option>
+                            <option value="derecho-penal-ii">Derecho Penal II</option>
+                            <option value="derecho-privado-iv">Derecho Privado IV</option>
+                            <option value="derecho-procesal-i">Derecho Procesal I</option>
+                            <option value="derecho-internacional-publico">Derecho Internacional Público</option>
+                            <option value="finanzas-derecho-financiero">Finanzas y Derecho Financiero</option>
+                            <option value="derecho-privado-v">Derecho Privado V</option>
+                            <option value="derecho-procesal-ii">Derecho Procesal II</option>
+                            <option value="derecho-comercial-i">Derecho Comercial I</option>
+                            <option value="derecho-administrativo-i">Derecho Administrativo I</option>
+                            <option value="derecho-trabajo-seguridad">Derecho del Trabajo y la Seguridad Social</option>
+                            <option value="derecho-privado-vi">Derecho Privado VI</option>
+                            <option value="derecho-comercial-ii">Derecho Comercial II</option>
+                            <option value="derecho-administrativo-ii">Derecho Administrativo II</option>
+                            <option value="derecho-internacional-privado">Derecho Internacional Privado</option>
+                            <option value="derecho-navegacion">Derecho de la Navegación</option>
+                            <option value="derecho-agrario">Derecho Agrario</option>
+                            <option value="derecho-mineria-energia">Derecho de Minería y Energía</option>
+                            <option value="filosofia-derecho">Filosofía del Derecho</option>
+                            <option value="derecho-notarial-registral">Derecho Notarial y Registral</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comisionActual">Comisión actual asignada *</label>
+                        <input type="text" id="comisionActual" placeholder="Ej: Comisión 3 - Martes 18:00 a 20:00 - Prof. García" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comisionDeseada">Comisión deseada *</label>
+                        <input type="text" id="comisionDeseada" placeholder="Ej: Comisión 1 - Jueves 10:00 a 12:00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contacto">Tu contacto *</label>
+                        <input type="text" id="contacto" placeholder="Telegram: @usuario o Email: tu-email@gmail.com" required>
+                        <small style="color: #666;">Tu contacto se mostrará parcialmente oculto por seguridad</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comentarios">Comentarios adicionales (opcional)</label>
+                        <textarea id="comentarios" rows="3" placeholder="Ej: Necesito cambiar por trabajo, flexible con horarios de tarde"></textarea>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="recibirPropuestas" checked>
+                        <label for="recibirPropuestas">Acepto recibir propuestas de permuta similares</label>
+                    </div>
+
+                    <button type="submit" class="btn">Publicar solicitud de permuta</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab: Ofertas disponibles -->
+        <div id="ofertas" class="tab-content">
+            <div class="filters">
+                <h3>Filtrar ofertas</h3>
+                <div class="filter-group">
+                    <select id="filterMateria">
+                        <option value="">Todas las materias</option>
+                        <option value="derecho-penal-i">Derecho Penal I</option>
+                        <option value="derecho-privado-i">Derecho Privado I</option>
+                        <option value="derecho-constitucional">Derecho Constitucional</option>
+                    </select>
+                    <select id="filterTurno">
+                        <option value="">Todos los turnos</option>
+                        <option value="mañana">Mañana (8-12hs)</option>
+                        <option value="tarde">Tarde (14-18hs)</option>
+                        <option value="noche">Noche (18-22hs)</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="aplicarFiltros()">Aplicar filtros</button>
+                </div>
+            </div>
+
+            <div class="offers-grid" id="offersContainer">
+                <!-- Ejemplo de tarjeta de oferta -->
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <span class="subject-tag">Derecho Penal I</span>
+                        <span class="match-indicator">✨ ¡Coincidencia!</span>
+                    </div>
+                    <div class="exchange-info">
+                        <div class="exchange-item">
+                            <strong>✅ Tiene:</strong> Comisión 4 - Viernes 19:00 a 21:00 - Prof. Martínez
+                        </div>
+                        <div class="exchange-item">
+                            <strong>🔄 Busca:</strong> Comisión 2 - Miércoles 14:00 a 16:00
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        "Necesito cambiar por superposición con otra materia. Flexible con otros horarios de tarde."
+                    </p>
+                    <button class="btn contact-btn" onclick="mostrarContacto('tele****gram')">
+                        📱 Ver contacto
+                    </button>
+                </div>
+
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <span class="subject-tag">Derecho Privado II</span>
+                    </div>
+                    <div class="exchange-info">
+                        <div class="exchange-item">
+                            <strong>✅ Tiene:</strong> Comisión 1 - Lunes 8:00 a 10:00 - Prof. Rodriguez
+                        </div>
+                        <div class="exchange-item">
+                            <strong>🔄 Busca:</strong> Cualquier comisión turno tarde/noche
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        "Trabajo por la mañana, necesito urgente cambiar a turno tarde o noche."
+                    </p>
+                    <button class="btn contact-btn" onclick="mostrarContacto('mar****@gmail.com')">
+                        📧 Ver contacto
+                    </button>
+                </div>
+
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <span class="subject-tag">Derecho Constitucional</span>
+                    </div>
+                    <div class="exchange-info">
+                        <div class="exchange-item">
+                            <strong>✅ Tiene:</strong> Comisión 3 - Jueves 18:00 a 20:00 - Prof. López
+                        </div>
+                        <div class="exchange-item">
+                            <strong>🔄 Busca:</strong> Comisión 5 - Sábados 9:00 a 11:00
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        "Prefiero cursar los sábados. La comisión 3 tiene muy buenos profes!"
+                    </p>
+                    <button class="btn contact-btn" onclick="mostrarContacto('@carl****')">
+                        📱 Ver contacto
+                    </button>
+                </div>
+            </div>
+
+            <div class="loader" id="loader">
+                <p>Cargando más ofertas...</p>
+            </div>
+        </div>
+
+        <!-- Tab: Éxitos de permuta -->
+        <div id="exitos" class="tab-content">
+            <h2>🎉 Historias de éxito recientes</h2>
+            <div class="success-stories">
+                <div class="success-card">
+                    <div class="success-date">📅 Hace 3 días</div>
+                    <h3>Permuta exitosa en Derecho Penal II</h3>
+                    <p>
+                        "¡Gracias al permutero pude cambiar de la comisión de viernes noche a martes tarde! 
+                        Coordinar con mi compañero fue súper fácil y en SIU Guaraní tardamos solo 5 minutos."
+                    </p>
+                    <small>- Usuario anónimo</small>
+                </div>
+
+                <div class="success-card">
+                    <div class="success-date">📅 Hace 1 semana</div>
+                    <h3>Intercambio grupal en Derecho Privado III</h3>
+                    <p>
+                        "Éramos 4 personas que necesitábamos rotar comisiones. El permutero nos ayudó a 
+                        organizarnos y todos conseguimos el horario que necesitábamos. ¡10/10!"
+                    </p>
+                    <small>- Grupo de estudio 2024</small>
+                </div>
+
+                <div class="success-card">
+                    <div class="success-date">📅 Hace 2 semanas</div>
+                    <h3>Cambio de último momento en Procesal I</h3>
+                    <p>
+                        "A una semana de empezar las clases conseguí cambiar mi comisión gracias a una 
+                        notificación del permutero. La plataforma detectó automáticamente la coincidencia."
+                    </p>
+                    <small>- Estudiante 3er año</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: ¿Cómo funciona? -->
+        <div id="como-funciona" class="tab-content">
+            <div class="form-container">
+                <h2>📖 Guía completa para realizar una permuta</h2>
+                
+                <h3>Paso 1: Encontrá tu match 🔍</h3>
+                <p>Publicá tu solicitud o buscá entre las ofertas disponibles. Cuando encuentres alguien que tenga lo que buscás y necesite lo que tenés, ¡es un match!</p>
+
+                <h3>Paso 2: Coordiná con tu compañero/a 🤝</h3>
+                <p>Contactate por el medio indicado (Telegram/Email) y acordá un día y horario para hacer el trámite juntos en SIU Guaraní.</p>
+
+                <h3>Paso 3: Realizá el trámite en SIU Guaraní 🖥️</h3>
+                <ol>
+                    <li>Ambos deben ingresar a SIU Guaraní <strong>al mismo tiempo</strong></li>
+                    <li>Ir a: Trámites → Solicitud de Cambio de Comisión</li>
+                    <li>Seleccionar la materia y la nueva comisión deseada</li>
+                    <li>Confirmar la solicitud</li>
+                    <li>El sistema procesará el cambio automáticamente si hay cupo</li>
+                </ol>
+
+                <div class="warning-box" style="margin-top: 2rem;">
+                    <span class="warning-icon">💡</span>
+                    <div>
+                        <strong>Tips importantes:</strong>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li>Las permutas se procesan por orden de llegada</li>
+                            <li>Deben hacerlo simultáneamente o el sistema no lo permitirá</li>
+                            <li>Una vez confirmado, el cambio es irreversible</li>
+                            <li>Verificá que la comisión tenga cupo disponible</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>¿Qué pasa si no hay coincidencias directas? 🔄</h3>
+                <p>A veces es posible hacer "permutas en cadena". Por ejemplo:</p>
+                <ul>
+                    <li>A tiene Com. 1 y quiere Com. 2</li>
+                    <li>B tiene Com. 2 y quiere Com. 3</li>
+                    <li>C tiene Com. 3 y quiere Com. 1</li>
+                </ul>
+                <p>¡Los tres pueden rotar simultáneamente! El permutero te ayuda a identificar estas oportunidades.</p>
+
+                <h3>Preguntas frecuentes ❓</h3>
+                <details style="margin: 1rem 0;">
+                    <summary style="cursor: pointer; font-weight: 600;">¿Hasta cuándo puedo hacer permutas?</summary>
+                    <p style="margin-top: 0.5rem;">Generalmente hasta la segunda semana de clases, pero verificá el calendario académico.</p>
+                </details>
+
+                <details style="margin: 1rem 0;">
+                    <summary style="cursor: pointer; font-weight: 600;">¿Puedo cambiar de cátedra además de comisión?</summary>
+                    <p style="margin-top: 0.5rem;">No, las permutas solo funcionan dentro de la misma cátedra. Para cambiar de cátedra necesitás hacer otro trámite.</p>
+                </details>
+
+                <details style="margin: 1rem 0;">
+                    <summary style="cursor: pointer; font-weight: 600;">¿Es seguro compartir mi contacto?</summary>
+                    <p style="margin-top: 0.5rem;">El permutero oculta parcialmente tu información. Solo se muestra completa cuando alguien quiere contactarte específicamente.</p>
+                </details>
+
+                <details style="margin: 1rem 0;">
+                    <summary style="cursor: pointer; font-weight: 600;">¿Qué hago si mi compañero/a no cumple?</summary>
+                    <p style="margin-top: 0.5rem;">Siempre pedí confirmación antes del trámite. Si no se presenta, podés reportarlo en el permutero para que otros usuarios estén alertas.</p>
+                </details>
+
+                <h3>Comisiones recomendadas 📝</h3>
+                <div class="exchange-info" style="margin-top: 1rem;">
+                    <p><strong>💬 Comentarios anónimos de estudiantes:</strong></p>
+                    <ul style="margin: 1rem;">
+                        <li>"La Comisión 5 de Civil I tiene prioridad en mesa de exámenes"</li>
+                        <li>"El Prof. González de Penal II explica muy bien y da muchos ejemplos prácticos"</li>
+                        <li>"Evitá la Comisión 3 de Constitucional si trabajás, es muy estricto con asistencia"</li>
+                        <li>"Las comisiones de sábado suelen tener profes más relajados con los horarios"</li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn" onclick="switchTab('busco-cambiar')">
+                        🚀 ¡Empezá a permutar ahora!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para mostrar contacto completo -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Información de contacto</h3>
+                <button class="close-btn" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div id="contactInfo"></div>
+            <div class="warning-box" style="margin-top: 1rem;">
+                <span class="warning-icon">🤝</span>
+                <div>
+                    <strong>Recordá:</strong> Coordiná bien el día y hora para hacer el trámite juntos en SIU Guaraní.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación de coincidencias -->
+    <div id="notification" class="notification">
+        <span>🎯</span>
+        <span id="notificationText">¡Hay 2 personas buscando el intercambio inverso al tuyo!</span>
+    </div>
+
+    <script>
+        // Base de datos simulada de ofertas
+        let ofertas = [
+            {
+                id: 1,
+                materia: 'derecho-penal-i',
+                materiaTexto: 'Derecho Penal I',
+                comisionActual: 'Comisión 4 - Viernes 19:00 a 21:00 - Prof. Martínez',
+                comisionDeseada: 'Comisión 2 - Miércoles 14:00 a 16:00',
+                contacto: 'telegram:@usuario1',
+                contactoOculto: 'tele****gram',
+                comentarios: 'Necesito cambiar por superposición con otra materia. Flexible con otros horarios de tarde.',
+                turno: 'noche',
+                coincidencia: true
+            },
+            {
+                id: 2,
+                materia: 'derecho-privado-ii',
+                materiaTexto: 'Derecho Privado II',
+                comisionActual: 'Comisión 1 - Lunes 8:00 a 10:00 - Prof. Rodriguez',
+                comisionDeseada: 'Cualquier comisión turno tarde/noche',
+                contacto: 'email:maria@gmail.com',
+                contactoOculto: 'mar****@gmail.com',
+                comentarios: 'Trabajo por la mañana, necesito urgente cambiar a turno tarde o noche.',
+                turno: 'mañana',
+                coincidencia: false
+            }
+        ];
+
+        // Función para cambiar pestañas
+        function switchTab(tabId) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar la pestaña seleccionada
+            document.getElementById(tabId).classList.add('active');
+            
+            // Activar el botón correspondiente
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndex = Array.from(tabs).findIndex(tab => 
+                tab.textContent.toLowerCase().includes(tabId.split('-')[0])
+            );
+            if (tabIndex !== -1) {
+                tabs[tabIndex].classList.add('active');
+            }
+        }
+
+        // Función para mostrar contacto
+        function mostrarContacto(contactoOculto) {
+            const modal = document.getElementById('contactModal');
+            const contactInfo = document.getElementById('contactInfo');
+            
+            // Simular búsqueda del contacto completo
+            const oferta = ofertas.find(o => o.contactoOculto === contactoOculto);
+            
+            if (oferta) {
+                const [tipo, valor] = oferta.contacto.split(':');
+                if (tipo === 'telegram') {
+                    contactInfo.innerHTML = `
+                        <div class="exchange-info">
+                            <h4>Contacto por Telegram</h4>
+                            <p style="font-size: 1.2rem; font-weight: 600;">📱 ${valor}</p>
+                            <p style="margin-top: 1rem;">Podés buscar este usuario en Telegram o hacer click en el siguiente enlace:</p>
+                            <a href="https://t.me/${valor.substring(1)}" target="_blank" class="btn btn-secondary" style="margin-top: 1rem;">
+                                Abrir en Telegram
+                            </a>
+                        </div>
+                    `;
+                } else if (tipo === 'email') {
+                    contactInfo.innerHTML = `
+                        <div class="exchange-info">
+                            <h4>Contacto por Email</h4>
+                            <p style="font-size: 1.2rem; font-weight: 600;">📧 ${valor}</p>
+                            <a href="mailto:${valor}" class="btn btn-secondary" style="margin-top: 1rem;">
+                                Enviar email
+                            </a>
+                        </div>
+                    `;
+                }
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Función para cerrar modal
+        function cerrarModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('contactModal');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+
+        // Función para ocultar parcialmente el contacto
+        function ocultarContacto(contacto) {
+            if (contacto.includes('@')) {
+                // Es Telegram
+                if (contacto.startsWith('@')) {
+                    return 'tele****gram';
+                }
+                // Es email
+                const [usuario, dominio] = contacto.split('@');
+                return usuario.substring(0, 3) + '****@' + dominio;
+            }
+            return contacto;
+        }
+
+        // Función para aplicar filtros
+        function aplicarFiltros() {
+            const materiaFilter = document.getElementById('filterMateria').value;
+            const turnoFilter = document.getElementById('filterTurno').value;
+            
+            // Aquí se aplicarían los filtros a las ofertas mostradas
+            console.log('Filtros aplicados:', { materia: materiaFilter, turno: turnoFilter });
+            
+            // Mostrar notificación de ejemplo
+            mostrarNotificacion('Filtros aplicados. Mostrando resultados actualizados.');
+        }
+
+        // Función para mostrar notificaciones
+        function mostrarNotificacion(mensaje) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = mensaje;
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('permuteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const formData = {
+                materia: document.getElementById('materia').value,
+                comisionActual: document.getElementById('comisionActual').value,
+                comisionDeseada: document.getElementById('comisionDeseada').value,
+                contacto: document.getElementById('contacto').value,
+                comentarios: document.getElementById('comentarios').value,
+                recibirPropuestas: document.getElementById('recibirPropuestas').checked
+            };
+            
+            // Simular guardado y búsqueda de coincidencias
+            console.log('Datos del formulario:', formData);
+            
+            // Simular detección de coincidencias
+            setTimeout(() => {
+                mostrarNotificacion('¡Publicado! Encontramos 2 posibles coincidencias para tu permuta.');
+                
+                // Limpiar formulario
+                document.getElementById('permuteForm').reset();
+                
+                // Cambiar a pestaña de ofertas
+                setTimeout(() => {
+                    switchTab('ofertas');
+                }, 2000);
+            }, 1000);
+        });
+
+        // Función para simular carga de más ofertas
+        function cargarMasOfertas() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                loader.style.display = 'none';
+                // Aquí se cargarían más ofertas de la base de datos
+            }, 1500);
+        }
+
+        // Detectar scroll para cargar más ofertas
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                // Usuario cerca del final de la página
+                if (document.getElementById('ofertas').classList.contains('active')) {
+                    // Solo si está en la pestaña de ofertas
+                    // cargarMasOfertas();
+                }
+            }
+        });
+
+        // Función para validar email UNLP
+        function validarEmailUNLP(email) {
+            return email.endsWith('@est.jursoc.unlp.edu.ar') || 
+                   email.endsWith('@jursoc.unlp.edu.ar');
+        }
+
+        // Agregar validación adicional al campo de contacto
+        document.getElementById('contacto').addEventListener('blur', function() {
+            const valor = this.value;
+            if (valor.includes('@') && !valor.startsWith('@')) {
+                // Es un email
+                if (!validarEmailUNLP(valor)) {
+                    console.log('Nota: El email no es de dominio UNLP');
+                }
+            }
+        });
+
+        // Inicializar tooltips o ayudas contextuales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar mensaje de bienvenida
+            if (!localStorage.getItem('visitado')) {
+                localStorage.setItem('visitado', 'true');
+                mostrarNotificacion('¡Bienvenido al Permutero! 🎓 Empezá publicando tu solicitud.');
+            }
+        });
+
+        // Función para generar estadísticas dinámicas
+        function actualizarEstadisticas() {
+            const totalOfertas = ofertas.length;
+            const ofertasConCoincidencia = ofertas.filter(o => o.coincidencia).length;
+            const porcentajeExito = Math.round((ofertasConCoincidencia / totalOfertas) * 100);
+            
+            // Actualizar banner si es necesario
+            console.log(`Estadísticas: ${totalOfertas} ofertas, ${porcentajeExito}% con coincidencias`);
+        }
+
+        // Simular actualización en tiempo real
+        setInterval(() => {
+            // Aquí se podría conectar con un servidor para obtener nuevas ofertas
+            actualizarEstadisticas();
+        }, 30000); // Cada 30 segundos
+    </script>
+</body>
+</html>
