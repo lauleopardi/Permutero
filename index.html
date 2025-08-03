@@ -812,33 +812,53 @@
     </div>
 
     <script>
-        // Base de datos simulada de ofertas
-        let ofertas = [
-            {
-                id: 1,
-                materia: 'derecho-penal-i',
-                materiaTexto: 'Derecho Penal I',
-                comisionActual: 'Comisión 4 - Viernes 19:00 a 21:00 - Prof. Martínez',
-                comisionDeseada: 'Comisión 2 - Miércoles 14:00 a 16:00',
-                contacto: 'telegram:@usuario1',
-                contactoOculto: 'tele****gram',
-                comentarios: 'Necesito cambiar por superposición con otra materia. Flexible con otros horarios de tarde.',
-                turno: 'noche',
-                coincidencia: true
-            },
-            {
-                id: 2,
-                materia: 'derecho-privado-ii',
-                materiaTexto: 'Derecho Privado II',
-                comisionActual: 'Comisión 1 - Lunes 8:00 a 10:00 - Prof. Rodriguez',
-                comisionDeseada: 'Cualquier comisión turno tarde/noche',
-                contacto: 'email:maria@gmail.com',
-                contactoOculto: 'mar****@gmail.com',
-                comentarios: 'Trabajo por la mañana, necesito urgente cambiar a turno tarde o noche.',
-                turno: 'mañana',
-                coincidencia: false
+        // Sistema de almacenamiento con LocalStorage
+        const STORAGE_KEY = 'permutero_ofertas';
+        
+        // Cargar ofertas desde LocalStorage o usar datos de ejemplo
+        function cargarOfertas() {
+            const ofertasGuardadas = localStorage.getItem(STORAGE_KEY);
+            if (ofertasGuardadas) {
+                return JSON.parse(ofertasGuardadas);
             }
-        ];
+            // Datos de ejemplo solo la primera vez
+            return [
+                {
+                    id: Date.now() - 100000,
+                    materia: 'derecho-penal-i',
+                    materiaTexto: 'Derecho Penal I',
+                    comisionActual: 'Comisión 4 - Viernes 19:00 a 21:00 - Prof. Martínez',
+                    comisionDeseada: 'Comisión 2 - Miércoles 14:00 a 16:00',
+                    contacto: 'telegram:@usuario1',
+                    contactoOculto: 'tele****gram',
+                    comentarios: 'Necesito cambiar por superposición con otra materia. Flexible con otros horarios de tarde.',
+                    turno: 'noche',
+                    fecha: new Date(Date.now() - 86400000).toISOString(),
+                    coincidencia: true
+                },
+                {
+                    id: Date.now() - 200000,
+                    materia: 'derecho-privado-ii',
+                    materiaTexto: 'Derecho Privado II',
+                    comisionActual: 'Comisión 1 - Lunes 8:00 a 10:00 - Prof. Rodriguez',
+                    comisionDeseada: 'Cualquier comisión turno tarde/noche',
+                    contacto: 'email:maria@gmail.com',
+                    contactoOculto: 'mar****@gmail.com',
+                    comentarios: 'Trabajo por la mañana, necesito urgente cambiar a turno tarde o noche.',
+                    turno: 'mañana',
+                    fecha: new Date(Date.now() - 172800000).toISOString(),
+                    coincidencia: false
+                }
+            ];
+        }
+        
+        // Guardar ofertas en LocalStorage
+        function guardarOfertas() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ofertas));
+        }
+        
+        // Inicializar ofertas
+        let ofertas = cargarOfertas();
 
         // Función para cambiar pestañas
         function switchTab(tabId) {
@@ -865,41 +885,93 @@
             }
         }
 
-        // Función para mostrar contacto
-        function mostrarContacto(contactoOculto) {
-            const modal = document.getElementById('contactModal');
-            const contactInfo = document.getElementById('contactInfo');
+        // Función para mostrar ofertas en la interfaz
+        function mostrarOfertas(ofertasFiltradas = ofertas) {
+            const container = document.getElementById('offersContainer');
+            container.innerHTML = '';
             
-            // Simular búsqueda del contacto completo
-            const oferta = ofertas.find(o => o.contactoOculto === contactoOculto);
-            
-            if (oferta) {
-                const [tipo, valor] = oferta.contacto.split(':');
-                if (tipo === 'telegram') {
-                    contactInfo.innerHTML = `
-                        <div class="exchange-info">
-                            <h4>Contacto por Telegram</h4>
-                            <p style="font-size: 1.2rem; font-weight: 600;">📱 ${valor}</p>
-                            <p style="margin-top: 1rem;">Podés buscar este usuario en Telegram o hacer click en el siguiente enlace:</p>
-                            <a href="https://t.me/${valor.substring(1)}" target="_blank" class="btn btn-secondary" style="margin-top: 1rem;">
-                                Abrir en Telegram
-                            </a>
-                        </div>
-                    `;
-                } else if (tipo === 'email') {
-                    contactInfo.innerHTML = `
-                        <div class="exchange-info">
-                            <h4>Contacto por Email</h4>
-                            <p style="font-size: 1.2rem; font-weight: 600;">📧 ${valor}</p>
-                            <a href="mailto:${valor}" class="btn btn-secondary" style="margin-top: 1rem;">
-                                Enviar email
-                            </a>
-                        </div>
-                    `;
-                }
+            if (ofertasFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <h3>No hay ofertas disponibles</h3>
+                        <p style="color: #666; margin-top: 1rem;">Sé el primero en publicar una solicitud de permuta</p>
+                        <button class="btn" onclick="switchTab('busco-cambiar')" style="margin-top: 1rem;">
+                            Publicar solicitud
+                        </button>
+                    </div>
+                `;
+                return;
             }
             
-            modal.style.display = 'flex';
+            // Ordenar por fecha más reciente
+            const ofertasOrdenadas = [...ofertasFiltradas].sort((a, b) => 
+                new Date(b.fecha || b.id) - new Date(a.fecha || a.id)
+            );
+            
+            ofertasOrdenadas.forEach(oferta => {
+                const tiempoTranscurrido = calcularTiempoTranscurrido(oferta.fecha || new Date(oferta.id));
+                const card = document.createElement('div');
+                card.className = 'offer-card';
+                card.innerHTML = `
+                    <div class="offer-header">
+                        <span class="subject-tag">${oferta.materiaTexto}</span>
+                        ${oferta.coincidencia ? '<span class="match-indicator">✨ ¡Coincidencia!</span>' : ''}
+                    </div>
+                    <div class="exchange-info">
+                        <div class="exchange-item">
+                            <strong>✅ Tiene:</strong> ${oferta.comisionActual}
+                        </div>
+                        <div class="exchange-item">
+                            <strong>🔄 Busca:</strong> ${oferta.comisionDeseada}
+                        </div>
+                    </div>
+                    ${oferta.comentarios ? `<p style="color: #666; font-size: 0.9rem;">"${oferta.comentarios}"</p>` : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <small style="color: #999;">Publicado ${tiempoTranscurrido}</small>
+                        <button class="btn btn-secondary" onclick="eliminarOferta(${oferta.id})" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                    <button class="btn contact-btn" onclick="mostrarContacto('${oferta.contactoOculto}')">
+                        ${oferta.contacto.startsWith('telegram') ? '📱 Ver contacto' : '📧 Ver contacto'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Función para calcular tiempo transcurrido
+        function calcularTiempoTranscurrido(fecha) {
+            const ahora = new Date();
+            const fechaPublicacion = new Date(fecha);
+            const diferencia = ahora - fechaPublicacion;
+            
+            const minutos = Math.floor(diferencia / 60000);
+            const horas = Math.floor(diferencia / 3600000);
+            const dias = Math.floor(diferencia / 86400000);
+            
+            if (minutos < 1) return 'hace un momento';
+            if (minutos < 60) return `hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
+            if (horas < 24) return `hace ${horas} hora${horas > 1 ? 's' : ''}`;
+            return `hace ${dias} día${dias > 1 ? 's' : ''}`;
+        }
+        
+        // Función para eliminar oferta
+        function eliminarOferta(id) {
+            if (confirm('¿Estás seguro de que querés eliminar esta oferta?')) {
+                ofertas = ofertas.filter(o => o.id !== id);
+                guardarOfertas();
+                mostrarOfertas();
+                mostrarNotificacion('Oferta eliminada correctamente');
+            }
+        }
+        
+        // Función para detectar el turno según el horario
+        function detectarTurno(comision) {
+            const hora = parseInt(comision.match(/\d{1,2}:/)?.[0] || '0');
+            if (hora >= 8 && hora < 13) return 'mañana';
+            if (hora >= 13 && hora < 18) return 'tarde';
+            return 'noche';
         }
 
         // Función para cerrar modal
@@ -934,11 +1006,41 @@
             const materiaFilter = document.getElementById('filterMateria').value;
             const turnoFilter = document.getElementById('filterTurno').value;
             
-            // Aquí se aplicarían los filtros a las ofertas mostradas
-            console.log('Filtros aplicados:', { materia: materiaFilter, turno: turnoFilter });
+            let ofertasFiltradas = ofertas;
             
-            // Mostrar notificación de ejemplo
-            mostrarNotificacion('Filtros aplicados. Mostrando resultados actualizados.');
+            if (materiaFilter) {
+                ofertasFiltradas = ofertasFiltradas.filter(o => o.materia === materiaFilter);
+            }
+            
+            if (turnoFilter) {
+                ofertasFiltradas = ofertasFiltradas.filter(o => o.turno === turnoFilter);
+            }
+            
+            mostrarOfertas(ofertasFiltradas);
+            mostrarNotificacion(`Mostrando ${ofertasFiltradas.length} resultado${ofertasFiltradas.length !== 1 ? 's' : ''}`);
+        }
+        
+        // Actualizar select de filtros con las materias actuales
+        function actualizarFiltros() {
+            const filterMateria = document.getElementById('filterMateria');
+            const materiasUnicas = [...new Set(ofertas.map(o => o.materia))];
+            
+            // Mantener la opción seleccionada
+            const seleccionActual = filterMateria.value;
+            
+            // Reconstruir opciones
+            filterMateria.innerHTML = '<option value="">Todas las materias</option>';
+            
+            const selectMateria = document.getElementById('materia');
+            materiasUnicas.forEach(materia => {
+                const option = Array.from(selectMateria.options).find(opt => opt.value === materia);
+                if (option) {
+                    filterMateria.innerHTML += `<option value="${materia}">${option.text}</option>`;
+                }
+            });
+            
+            // Restaurar selección
+            filterMateria.value = seleccionActual;
         }
 
         // Función para mostrar notificaciones
@@ -959,31 +1061,68 @@
             e.preventDefault();
             
             // Obtener valores del formulario
+            const materia = document.getElementById('materia');
             const formData = {
-                materia: document.getElementById('materia').value,
+                id: Date.now(),
+                materia: materia.value,
+                materiaTexto: materia.options[materia.selectedIndex].text,
                 comisionActual: document.getElementById('comisionActual').value,
                 comisionDeseada: document.getElementById('comisionDeseada').value,
                 contacto: document.getElementById('contacto').value,
                 comentarios: document.getElementById('comentarios').value,
-                recibirPropuestas: document.getElementById('recibirPropuestas').checked
+                recibirPropuestas: document.getElementById('recibirPropuestas').checked,
+                fecha: new Date().toISOString(),
+                turno: detectarTurno(document.getElementById('comisionActual').value)
             };
             
-            // Simular guardado y búsqueda de coincidencias
-            console.log('Datos del formulario:', formData);
+            // Ocultar contacto
+            formData.contactoOculto = ocultarContacto(formData.contacto);
             
-            // Simular detección de coincidencias
+            // Detectar si es Telegram o email y formatear correctamente
+            if (formData.contacto.startsWith('@')) {
+                formData.contacto = 'telegram:' + formData.contacto;
+            } else if (formData.contacto.includes('@')) {
+                formData.contacto = 'email:' + formData.contacto;
+            } else if (!formData.contacto.includes(':')) {
+                // Asumir Telegram si no tiene formato específico
+                formData.contacto = 'telegram:@' + formData.contacto;
+                formData.contactoOculto = ocultarContacto('@' + formData.contacto);
+            }
+            
+            // Buscar coincidencias
+            const coincidencias = buscarCoincidencias(formData);
+            formData.coincidencia = coincidencias.length > 0;
+            
+            // Agregar a la lista de ofertas
+            ofertas.unshift(formData);
+            guardarOfertas();
+            
+            // Mostrar notificación
+            if (coincidencias.length > 0) {
+                mostrarNotificacion(`¡Publicado! Encontramos ${coincidencias.length} posible${coincidencias.length > 1 ? 's' : ''} coincidencia${coincidencias.length > 1 ? 's' : ''} para tu permuta.`);
+            } else {
+                mostrarNotificacion('¡Solicitud publicada exitosamente! Te notificaremos cuando haya coincidencias.');
+            }
+            
+            // Limpiar formulario
+            document.getElementById('permuteForm').reset();
+            
+            // Cambiar a pestaña de ofertas después de un breve delay
             setTimeout(() => {
-                mostrarNotificacion('¡Publicado! Encontramos 2 posibles coincidencias para tu permuta.');
-                
-                // Limpiar formulario
-                document.getElementById('permuteForm').reset();
-                
-                // Cambiar a pestaña de ofertas
-                setTimeout(() => {
-                    switchTab('ofertas');
-                }, 2000);
-            }, 1000);
+                switchTab('ofertas');
+                mostrarOfertas();
+            }, 2000);
         });
+        
+        // Función para buscar coincidencias
+        function buscarCoincidencias(nuevaOferta) {
+            return ofertas.filter(oferta => {
+                // Coincidencia directa: A busca lo que B tiene y B busca lo que A tiene
+                return oferta.materia === nuevaOferta.materia &&
+                       oferta.comisionActual.toLowerCase().includes(nuevaOferta.comisionDeseada.toLowerCase()) &&
+                       oferta.comisionDeseada.toLowerCase().includes(nuevaOferta.comisionActual.toLowerCase());
+            });
+        }
 
         // Función para simular carga de más ofertas
         function cargarMasOfertas() {
@@ -1024,30 +1163,65 @@
             }
         });
 
-        // Inicializar tooltips o ayudas contextuales
+        // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar mensaje de bienvenida
+            // Mostrar ofertas al cargar
+            mostrarOfertas();
+            actualizarFiltros();
+            
+            // Mostrar mensaje de bienvenida solo la primera vez
             if (!localStorage.getItem('visitado')) {
                 localStorage.setItem('visitado', 'true');
                 mostrarNotificacion('¡Bienvenido al Permutero! 🎓 Empezá publicando tu solicitud.');
             }
-        });
-
-        // Función para generar estadísticas dinámicas
-        function actualizarEstadisticas() {
-            const totalOfertas = ofertas.length;
-            const ofertasConCoincidencia = ofertas.filter(o => o.coincidencia).length;
-            const porcentajeExito = Math.round((ofertasConCoincidencia / totalOfertas) * 100);
             
-            // Actualizar banner si es necesario
-            console.log(`Estadísticas: ${totalOfertas} ofertas, ${porcentajeExito}% con coincidencias`);
-        }
-
-        // Simular actualización en tiempo real
-        setInterval(() => {
-            // Aquí se podría conectar con un servidor para obtener nuevas ofertas
+            // Actualizar estadísticas
             actualizarEstadisticas();
-        }, 30000); // Cada 30 segundos
+            
+            // Listener para cambios de pestaña
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.addEventListener('click', () => {
+                    if (index === 1) { // Pestaña de ofertas
+                        mostrarOfertas();
+                        actualizarFiltros();
+                    }
+                });
+            });
+        });
+        
+        // Función para exportar/importar datos (útil para backup)
+        function exportarDatos() {
+            const datos = {
+                ofertas: ofertas,
+                fecha_exportacion: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `permutero_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+        
+        // Función para limpiar ofertas antiguas (más de 30 días)
+        function limpiarOfertasAntiguas() {
+            const hace30Dias = new Date();
+            hace30Dias.setDate(hace30Dias.getDate() - 30);
+            
+            const ofertasActuales = ofertas.filter(oferta => {
+                const fechaOferta = new Date(oferta.fecha || oferta.id);
+                return fechaOferta > hace30Dias;
+            });
+            
+            if (ofertasActuales.length < ofertas.length) {
+                ofertas = ofertasActuales;
+                guardarOfertas();
+                console.log(`Se eliminaron ${ofertas.length - ofertasActuales.length} ofertas antiguas`);
+            }
+        }
+        
+        // Ejecutar limpieza al cargar
+        limpiarOfertasAntiguas();
     </script>
 </body>
 </html>
